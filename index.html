@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de detalles con Videos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            -webkit-text-size-adjust: 100%; /* Previene ajuste automático de texto en iOS */
+        }
+        
+        header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            text-align: center;
+            padding: 1.5rem 0;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            padding: 0 10px;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            padding: 0 10px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            background-color: #000;
+        }
+        
+        .product-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: background-color 0.3s;
+        }
+        
+        .play-button:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        
+        .play-button::after {
+            content: '';
+            border-style: solid;
+            border-width: 10px 0 10px 20px;
+            border-color: transparent transparent transparent #ffffff;
+            margin-left: 5px;
+        }
+        
+        .volume-control {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px;
+            border-radius: 20px;
+        }
+        
+        .volume-slider {
+            width: 80px;
+            margin-left: 5px;
+            -webkit-appearance: none;
+            height: 5px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+        }
+        
+        .product-info {
+            padding: 1.2rem;
+        }
+        
+        .product-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            color: #2c3e50;
+            min-height: auto;
+        }
+        
+        .product-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .price-soles, .price-dollars {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .price-dollars {
+            color: #27ae60;
+        }
+        
+        .currency-label {
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            display: block;
+        }
+        
+        .order-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+            width: 100%;
+            margin-top: 10px;
+            -webkit-tap-highlight-color: transparent; /* Elimina el highlight al tocar en móviles */
+        }
+        
+        .order-btn:hover {
+            background: #219653;
+        }
+        
+        .order-btn.copied {
+            background: #f39c12;
+        }
+        
+        .currency-toggle {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .toggle-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .toggle-btn:hover {
+            background: #2980b9;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            max-width: calc(100% - 40px);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        footer {
+            background-color: #34495e;
+            color: white;
+            text-align: center;
+            padding: 1.2rem 0;
+            margin-top: 2rem;
+        }
+        
+        /* Modal para mostrar la imagen y el enlace de pedido */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-image {
+            max-width: 100%;
+            max-height: 250px;
+            margin-bottom: 1.2rem;
+            border-radius: 5px;
+        }
+        
+        .modal-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+        
+        .payment-methods {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 1.2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .payment-method {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+            width: 90px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .payment-method:hover {
+            border-color: #3498db;
+            background-color: #f8f9fa;
+        }
+        
+        .payment-method.selected {
+            border-color: #27ae60;
+            background-color: #e8f5e9;
+        }
+        
+        .payment-icon {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .payment-name {
+            font-size: 0.75rem;
+            text-align: center;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+        
+        .modal-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+            min-width: 120px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .modal-close {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .modal-close:hover {
+            background: #c0392b;
+        }
+        
+        .modal-order {
+            background: #27ae60;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .modal-order:hover {
+            background: #219653;
+        }
+        
+        .modal-order:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .whatsapp-info {
+            text-align: center;
+            margin: 12px 0;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 5px;
+            color: #2e7d32;
+            font-size: 0.85rem;
+        }
+        
+        /* Media queries para responsividad */
+        @media (max-width: 1024px) {
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 1rem;
+            }
+            
+            .video-container {
+                height: 180px;
+            }
+            
+            .play-button {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .volume-slider {
+                width: 60px;
+            }
+            
+            .product-info {
+                padding: 1rem;
+            }
+            
+            .product-title {
+                font-size: 1.1rem;
+                margin-bottom: 0.7rem;
+            }
+            
+            .modal-content {
+                padding: 1.2rem;
+            }
+            
+            .payment-method {
+                width: 80px;
+                padding: 6px;
+            }
+            
+            .payment-icon {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            header {
+                padding: 1.2rem 0;
+            }
+            
+            h1 {
+                font-size: 1.7rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .product-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            .video-container {
+                height: 200px;
+            }
+            
+            .play-button {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .volume-slider {
+                width: 50px;
+            }
+            
+            .product-price {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .price-soles, .price-dollars {
+                text-align: center;
+                margin-bottom: 8px;
+            }
+            
+            .toggle-btn, .order-btn, .modal-btn {
+                padding: 14px 20px; /* Más grande para mejor tacto */
+                font-size: 1rem;
+            }
+            
+            .modal-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .modal-btn {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .payment-methods {
+                gap: 8px;
+            }
+            
+            .payment-method {
+                width: 75px;
+            }
+            
+            .payment-icon {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .container {
+                padding: 0 10px;
+            }
+            
+            .product-info {
+                padding: 0.8rem;
+            }
+            
+            .product-title {
+                font-size: 1rem;
+            }
+            
+            .price-soles, .price-dollars {
+                font-size: 0.9rem;
+            }
+            
+            .payment-method {
+                width: 70px;
+            }
+            
+            .payment-icon {
+                font-size: 1.3rem;
+            }
+        }
+        
+        .hidden-canvas {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+        }
+        
+        /* Prevenir zoom en inputs en iOS */
+        @media screen and (max-width: 768px) {
+            input[type="range"] {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="notification" id="notification">
+        ¡Imagen copiada al portapapeles! Puedes pegarla donde necesites.
+    </div>
+    
+    <!-- Modal para mostrar la imagen y el enlace de pedido -->
+    <div class="modal" id="orderModal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalProductTitle">Producto</h3>
+            <img class="modal-image" id="modalProductImage" src="" alt="Imagen del producto">
+            
+            <div class="whatsapp-info">
+                <p>Selecciona tu método de pago preferido</p>
+                <p>Se abrirá WhatsApp para completar tu pedido</p>
+            </div>
+            
+            <div class="payment-methods">
+                <div class="payment-method" data-method="paypal">
+                    <div class="payment-icon">💳</div>
+                    <div class="payment-name">PayPal</div>
+                </div>
+                <div class="payment-method" data-method="yape">
+                    <div class="payment-icon">📱</div>
+                    <div class="payment-name">Yape</div>
+                </div>
+                <div class="payment-method" data-method="crypto">
+                    <div class="payment-icon">₿</div>
+                    <div class="payment-name">Cripto</div>
+                </div>
+                <!-- Nueva opción de pago: Otras opciones -->
+                <div class="payment-method" data-method="other">
+                    <div class="payment-icon">🔀</div>
+                    <div class="payment-name">Otras opciones</div>
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn modal-close" id="modalClose">Cerrar</button>
+                <button class="modal-btn modal-order" id="modalOrderBtn" disabled>Pedir ahora</button>
+            </div>
+        </div>
+    </div>
+    
+    <header>
+        <div class="container">
+            <h1>CATALOGO DE DETALLES</h1>
+            <p class="subtitle">Descubre nuestros detalles aqui</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="currency-toggle">
+            <button class="toggle-btn" id="currencyToggle">Mostrar precios en Soles S/</button>
+        </div>
+        
+        <div class="product-grid">
+            <!-- Producto 1 -->
+            <div class="product-card">
+                <div class="video-container">
+                    <video class="product-video" poster="img/producto1-poster.jpg" loop>
+                        <source src="videos/producto1.mp4" type="video/mp4">
+                        Tu navegador no soporta el elemento de video.
+                    </video>
+                    <div class="play-button"></div>
+                    <div class="volume-control">
+                        <span class="volume-icon">🔊</span>
+                        <input type="range" class="volume-slider" min="0" max="100" value="100">
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Te amo (dinámico)</h3>
+                    <div class="product-price">
+                        <div class="price-dollars">
+                            <span class="currency-label">USD</span>
+                            normal: $4.00 personalizado: $8.00
+                        </div>
+                        <div class="price-soles" style="display:none;">
+                            <span class="currency-label">PEN</span>
+                            normal: s/7.00 personalizado: s/12.00
+                        </div>
+                    </div>
+                    <button class="order-btn" data-poster="img/producto1-poster.jpg" data-title="Te amo (dinámico)">Pedir Producto</button>
+                </div>
+            </div>
+            
+            <!-- Producto 2 -->
+            <div class="product-card">
+                <div class="video-container">
+                    <video class="product-video" poster="img/producto2-poster.jpg" loop>
+                        <source src="videos/producto2.mp4" type="video/mp4">
+                        Tu navegador no soporta el elemento de video.
+                    </video>
+                    <div class="play-button"></div>
+                    <div class="volume-control">
+                        <span class="volume-icon">🔊</span>
+                        <input type="range" class="volume-slider" min="0" max="100" value="100">
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">carta (dinamica)</h3>
+                    <div class="product-price">
+                        <div class="price-dollars">
+                            <span class="currency-label">USD</span>
+                            normal: $5.00 personalizado: $8.00
+                        </div>
+                        <div class="price-soles" style="display:none;">
+                            <span class="currency-label">PEN</span>
+                            normal: s/10.00 personalizado: s/15.00
+                        </div>
+                    </div>
+                    <button class="order-btn" data-poster="img/producto2-poster.jpg" data-title="carta (dinamica)">Pedir Producto</button>
+                </div>
+            </div>
+            
+            <!-- Producto 3 -->
+            <div class="product-card">
+                <div class="video-container">
+                    <video class="product-video" poster="img/producto3-poster.jpg" loop>
+                        <source src="videos/producto3.mp4" type="video/mp4">
+                        Tu navegador no soporta el elemento de video.
+                    </video>
+                    <div class="play-button"></div>
+                    <div class="volume-control">
+                        <span class="volume-icon">🔊</span>
+                        <input type="range" class="volume-slider" min="0" max="100" value="100">
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">muro de fotos (con fraces)</h3>
+                    <div class="product-price">
+                        <div class="price-dollars">
+                            <span class="currency-label">USD</span>
+                            personalizado: $15.00
+                        </div>
+                        <div class="price-soles" style="display:none;">
+                            <span class="currency-label">PEN</span>
+                            personalizado: s/25.00
+                        </div>
+                    </div>
+                    <button class="order-btn" data-poster="img/producto3-poster.jpg" data-title="muro de fotos (con fraces)">Pedir Producto</button>
+                </div>
+            </div>
+            
+            <!-- Producto 4 -->
+            <div class="product-card">
+                <div class="video-container">
+                    <video class="product-video" poster="img/producto4-poster.jpg" loop>
+                        <source src="videos/producto4.mp4" type="video/mp4">
+                        Tu navegador no soporta el elemento de video.
+                    </video>
+                    <div class="play-button"></div>
+                    <div class="volume-control">
+                        <span class="volume-icon">🔊</span>
+                        <input type="range" class="volume-slider" min="0" max="100" value="100">
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">fuegos artificiales</h3>
+                    <div class="product-price">
+                        <div class="price-dollars">
+                            <span class="currency-label">USD</span>
+                            personalizado $8.00
+                        </div>
+                        <div class="price-soles" style="display:none;">
+                            <span class="currency-label">PEN</span>
+                            personalizado S/15.00
+                        </div>
+                    </div>
+                    <button class="order-btn" data-poster="img/producto4-poster.jpg" data-title="fuegos artificiales">Pedir Producto</button>
+                </div>
+            </div>
+            
+            <!-- Producto 5 -->
+            <div class="product-card">
+                <div class="video-container">
+                    <video class="product-video" poster="img/producto5-poster.jpg" loop>
+                        <source src="videos/producto5.mp4" type="video/mp4">
+                        Tu navegador no soporta el elemento de video.
+                    </video>
+                    <div class="play-button"></div>
+                    <div class="volume-control">
+                        <span class="volume-icon">🔊</span>
+                        <input type="range" class="volume-slider" min="0" max="100" value="100">
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">fuegos artificiales (con fotos)</h3>
+                    <div class="product-price">
+                        <div class="price-dollars">
+                            <span class="currency-label">USD</span>
+                            personalizado $15.00
+                        </div>
+                        <div class="price-soles" style="display:none;">
+                            <span class="currency-label">PEN</span>
+                            personalizado S/25.00
+                        </div>
+                    </div>
+                    <button class="order-btn" data-poster="img/producto5-poster.jpg" data-title="fuegos artificiales (con fotos)">Pedir Producto</button>
+                </div>
+            </div>
+            
+            <!-- Producto 6 - CORREGIDO: tipo MIME incorrecto -->
+            <div class="product-card">
+                <div class="video-container">
+                    <video class="product-video" poster="img/producto6-poster.jpg" loop>
+                        <source src="videos/producto6.mp4" type="video/mp4">
+                        Tu navegador no soporta el elemento de video.
+                    </video>
+                    <div class="play-button"></div>
+                    <div class="volume-control">
+                        <span class="volume-icon">🔊</span>
+                        <input type="range" class="volume-slider" min="0" max="100" value="100">
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">mi bonita (tiroteo)</h3>
+                    <div class="product-price">
+                        <div class="price-dollars">
+                            <span class="currency-label">USD</span>
+                            normal: $4.00 personalizado: $8.00
+                        </div>
+                        <div class="price-soles" style="display:none;">
+                            <span class="currency-label">PEN</span>
+                            normal: s/7.00 personalizado: s/12.00
+                        </div>
+                    </div>
+                    <button class="order-btn" data-poster="img/producto6-poster.jpg" data-title="mi bonita (tiroteo)">Pedir Producto</button>
+                </div>
+            </div>
+            
+            <!-- Producto 7 -->
+            <div class="product-card">
+                <div class="video-container">
+                    <video class="product-video" poster="img/producto7-poster.jpg" loop>
+                        <source src="videos/producto7.mp4" type="video/mp4">
+                        Tu navegador no soporta el elemento de video.
+                    </video>
+                    <div class="play-button"></div>
+                    <div class="volume-control">
+                        <span class="volume-icon">🔊</span>
+                        <input type="range" class="volume-slider" min="0" max="100" value="100">
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Mi bonita</h3>
+                    <div class="product-price">
+                        <div class="price-dollars">
+                            <span class="currency-label">USD</span>
+                            normal: $4.00 personalizado: $8.00
+                        </div>
+                        <div class="price-soles" style="display:none;">
+                            <span class="currency-label">PEN</span>
+                            normal: s/7.00 personalizado: s/12.00
+                        </div>
+                    </div>
+                    <button class="order-btn" data-poster="img/producto7-poster.jpg" data-title="Mi bonita">Pedir Producto</button>
+                </div>
+            </div>
+            
+            <!-- Producto 8 - NUEVO PRODUCTO AÑADIDO -->
+            <div class="product-card">
+                <div class="video-container">
+                    <video class="product-video" poster="img/producto8-poster.jpg" loop>
+                        <source src="videos/producto8.mp4" type="video/mp4">
+                        Tu navegador no soporta el elemento de video.
+                    </video>
+                    <div class="play-button"></div>
+                    <div class="volume-control">
+                        <span class="volume-icon">🔊</span>
+                        <input type="range" class="volume-slider" min="0" max="100" value="100">
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">linda muchachita (dinamico)</h3>
+                    <div class="product-price">
+                        <div class="price-dollars">
+                            <span class="currency-label">USD</span>
+                            personalizado: $12.00
+                        </div>
+                        <div class="price-soles" style="display:none;">
+                            <span class="currency-label">PEN</span>
+                            personalizado: s/20.00
+                        </div>
+                    </div>
+                    <button class="order-btn" data-poster="img/producto8-poster.jpg" data-title="linda muchachita (dinamico)">Pedir Producto</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>© Catálogo de detalles. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Canvas oculto para copiar imágenes -->
+    <canvas id="copyCanvas" class="hidden-canvas"></canvas>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButton = document.getElementById('currencyToggle');
+            let showingDollars = true;
+            
+            toggleButton.addEventListener('click', function() {
+                const solesPrices = document.querySelectorAll('.price-soles');
+                const dollarsPrices = document.querySelectorAll('.price-dollars');
+                
+                if (showingDollars) {
+                    dollarsPrices.forEach(price => price.style.display = 'none');
+                    solesPrices.forEach(price => price.style.display = 'block');
+                    toggleButton.textContent = 'Mostrar precios en Dólares $';
+                } else {
+                    solesPrices.forEach(price => price.style.display = 'none');
+                    dollarsPrices.forEach(price => price.style.display = 'block');
+                    toggleButton.textContent = 'Mostrar precios en Soles';
+                }
+                
+                showingDollars = !showingDollars;
+            });
+            
+            // Control de videos
+            const playButtons = document.querySelectorAll('.play-button');
+            const videos = document.querySelectorAll('.product-video');
+            const volumeSliders = document.querySelectorAll('.volume-slider');
+            
+            // Configurar volumen inicial al 100% para todos los videos
+            videos.forEach(video => {
+                video.volume = 1.0; // 100% de volumen
+            });
+            
+            // Configurar controladores de volumen
+            volumeSliders.forEach((slider, index) => {
+                const video = videos[index];
+                
+                // Establecer volumen inicial
+                slider.value = 100;
+                video.volume = 1.0;
+                
+                // Controlar volumen cuando se mueve el slider
+                slider.addEventListener('input', function() {
+                    video.volume = this.value / 100;
+                });
+            });
+            
+            // Control de reproducción
+            playButtons.forEach((button, index) => {
+                const video = videos[index];
+                
+                button.addEventListener('click', function() {
+                    if (video.paused) {
+                        video.play();
+                        button.style.display = 'none';
+                    } else {
+                        video.pause();
+                        button.style.display = 'flex';
+                    }
+                });
+                
+                // Para dispositivos táctiles: prevenir el evento de clic para evitar conflictos
+                button.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    if (video.paused) {
+                        video.play();
+                        button.style.display = 'none';
+                    } else {
+                        video.pause();
+                        button.style.display = 'flex';
+                    }
+                }, {passive: false});
+            });
+            
+            // Mostrar botón de play cuando el video termina
+            videos.forEach(video => {
+                video.addEventListener('ended', function() {
+                    const container = this.closest('.video-container');
+                    const playButton = container.querySelector('.play-button');
+                    playButton.style.display = 'flex';
+                });
+                
+                video.addEventListener('click', function() {
+                    const container = this.closest('.video-container');
+                    const playButton = container.querySelector('.play-button');
+                    
+                    if (this.paused) {
+                        this.play();
+                        playButton.style.display = 'none';
+                    } else {
+                        this.pause();
+                        playButton.style.display = 'flex';
+                    }
+                });
+            });
+            
+            // Modal para mostrar la imagen y el enlace de pedido
+            const modal = document.getElementById('orderModal');
+            const modalImage = document.getElementById('modalProductImage');
+            const modalTitle = document.getElementById('modalProductTitle');
+            const modalOrderBtn = document.getElementById('modalOrderBtn');
+            const modalClose = document.getElementById('modalClose');
+            const orderButtons = document.querySelectorAll('.order-btn');
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            
+            let selectedPaymentMethod = null;
+            let currentProductTitle = '';
+            
+            // Selección de método de pago
+            paymentMethods.forEach(method => {
+                method.addEventListener('click', function() {
+                    // Quitar selección anterior
+                    paymentMethods.forEach(m => m.classList.remove('selected'));
+                    
+                    // Añadir selección actual
+                    this.classList.add('selected');
+                    selectedPaymentMethod = this.getAttribute('data-method');
+                    
+                    // Habilitar botón de pedido
+                    modalOrderBtn.disabled = false;
+                });
+                
+                // Para dispositivos táctiles
+                method.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    paymentMethods.forEach(m => m.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedPaymentMethod = this.getAttribute('data-method');
+                    modalOrderBtn.disabled = false;
+                }, {passive: false});
+            });
+            
+            // Función para abrir el modal con la imagen del producto
+            orderButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const posterUrl = this.getAttribute('data-poster');
+                    currentProductTitle = this.getAttribute('data-title');
+                    
+                    // Configurar el modal con la imagen y título del producto
+                    modalImage.src = posterUrl;
+                    modalImage.alt = currentProductTitle;
+                    modalTitle.textContent = currentProductTitle;
+                    
+                    // Reiniciar selección de método de pago
+                    paymentMethods.forEach(m => m.classList.remove('selected'));
+                    selectedPaymentMethod = null;
+                    modalOrderBtn.disabled = true;
+                    
+                    // Mostrar el modal
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden'; // Prevenir scroll en fondo
+                });
+            });
+            
+            // Acción al hacer clic en Pedir Ahora
+            modalOrderBtn.addEventListener('click', function() {
+                if (!selectedPaymentMethod) return;
+                
+                // Configurar el mensaje de WhatsApp con el método de pago seleccionado
+                const phoneNumber = "51950196501";
+                let paymentText = '';
+                
+                switch(selectedPaymentMethod) {
+                    case 'paypal':
+                        paymentText = 'Pago con PayPal';
+                        break;
+                    case 'yape':
+                        paymentText = 'Pago con Yape';
+                        break;
+                    case 'crypto':
+                        paymentText = 'Pago con Criptomonedas';
+                        break;
+                    case 'other':
+                        paymentText = 'Otras opciones de pago';
+                        break;
+                }
+                
+                const message = `Hola, me interesa el producto: ${currentProductTitle}. Quiero pagar con ${paymentText}. ¿Podrían darme más información?`;
+                const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+                
+                // Abrir WhatsApp
+                window.open(whatsappUrl, '_blank');
+                
+                // Cerrar el modal
+                modal.style.display = 'none';
+                document.body.style.overflow = ''; // Restaurar scroll
+            });
+            
+            // Cerrar el modal
+            modalClose.addEventListener('click', function() {
+                modal.style.display = 'none';
+                document.body.style.overflow = ''; // Restaurar scroll
+            });
+            
+            // Cerrar el modal al hacer clic fuera del contenido
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = ''; // Restaurar scroll
+                }
+            });
+            
+            // Para dispositivos móviles: prevenir el comportamiento por defecto en ciertos elementos
+            document.querySelectorAll('video').forEach(video => {
+                video.addEventListener('touchstart', function(e) {
+                    // Permitir el evento táctil para controles nativos
+                }, {passive: true});
+            });
+            
+            // Ajustar el tamaño del canvas oculto
+            const copyCanvas = document.getElementById('copyCanvas');
+            const ctx = copyCanvas.getContext('2d');
+            
+            // Función para copiar imagen al portapapeles
+            function copyImageToClipboard(imgSrc) {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.src = imgSrc;
+                
+                img.onload = function() {
+                    // Configurar el tamaño del canvas al de la imagen
+                    copyCanvas.width = img.width;
+                    copyCanvas.height = img.height;
+                    
+                    // Dibujar la imagen en el canvas
+                    ctx.drawImage(img, 0, 0, img.width, img.height);
+                    
+                    // Copiar la imagen al portapapeles
+                    copyCanvas.toBlob(function(blob) {
+                        try {
+                            const item = new ClipboardItem({ 'image/png': blob });
+                            navigator.clipboard.write([item]).then(function() {
+                                showNotification();
+                            }, function(err) {
+                                console.error('Error al copiar la imagen: ', err);
+                                // Fallback: abrir la imagen en una nueva pestaña
+                                window.open(imgSrc, '_blank');
+                            });
+                        } catch (err) {
+                            console.error('Error al copiar la imagen: ', err);
+                            // Fallback: abrir la imagen en una nueva pestaña
+                            window.open(imgSrc, '_blank');
+                        }
+                    });
+                };
+                
+                img.onerror = function() {
+                    // Si hay error al cargar la imagen, abrir en nueva pestaña
+                    window.open(imgSrc, '_blank');
+                };
+            }
+            
+            // Mostrar notificación
+            function showNotification() {
+                const notification = document.getElementById('notification');
+                notification.classList.add('show');
+                
+                setTimeout(function() {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
